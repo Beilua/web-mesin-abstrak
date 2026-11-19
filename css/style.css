@@ -142,6 +142,9 @@ textarea:focus-visible, summary:focus-visible {
 .sel-pita.aktif.dalam-kata { background: var(--primer); }
 .sel-pita.setelah-eop { opacity: .35; border-style: dashed; }
 .status-pita { margin: 8px 0 0; color: var(--muted); font-size: .92rem; }
+/* Kata tanpa spasi tidak boleh melebarkan halaman; pita sendiri tetap scroll. */
+.status-pita, .penjelasan, .var-nilai, .log li { overflow-wrap: anywhere; }
+.var-nilai { min-width: 0; }
 /* Legenda warna */
 .legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 12px 0 0; font-size: .88rem; color: var(--muted); }
 .legenda-item { display: inline-flex; align-items: center; gap: 7px; }

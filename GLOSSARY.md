@@ -53,6 +53,9 @@ Operasi mesin kata yang mengosongkan CW tanpa memindahkan posisi baca.
 **GET CC**:
 Operasi baca yang mengembalikan CC tanpa memindahkan mesin.
 
+**GET IDX**:
+Operasi baca yang mengembalikan posisi baca (idx) tanpa memindahkan mesin.
+
 **GET CW**:
 Operasi baca yang mengembalikan CW tanpa memindahkan mesin.
 
@@ -64,4 +67,4 @@ Satu tekanan tombol yang mengubah state mesin, yaitu START, INC, ADV, atau RESET
 _Avoid_: step, iterasi
 
 **Operasi baca**:
-Tekanan tombol yang hanya menampilkan nilai, yaitu GET CC, GET CW, GET LEN, dan EOP, tanpa memindahkan mesin.
+Tekanan tombol yang hanya menampilkan nilai, yaitu GET CC, GET IDX, GET CW, GET LEN, dan EOP, tanpa memindahkan mesin.

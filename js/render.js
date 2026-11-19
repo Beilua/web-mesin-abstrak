@@ -132,7 +132,9 @@
       var aksi = document.createElement('b');
       aksi.textContent = item[0];
       baris.appendChild(aksi);
-      baris.appendChild(document.createTextNode(' ' + item[1]));
+      // Buang awalan "<AKSI>: " agar label tebal tidak muncul dua kali.
+      var teks = item[1].replace(/^[A-Z]+(?: [A-Z]+)*: /, '');
+      baris.appendChild(document.createTextNode(' ' + teks));
       el.appendChild(baris);
     });
   }
@@ -159,7 +161,8 @@
           var isi = baris;
           // Baris #define diperbarui di tempat agar baris kosong sesudahnya tetap ada.
           if (blok.eop) {
-            isi = baris.replace("'.'", "'" + escapeC(eop) + "'");
+            // Fungsi pengganti agar `$` pada EOP tidak ditafsirkan sebagai pola replace.
+            isi = baris.replace("'.'", function () { return "'" + escapeC(eop) + "'"; });
           }
           var span = document.createElement('span');
           span.className = 'baris-kode';

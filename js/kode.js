@@ -3,7 +3,7 @@
 
   // Sumber C dari modul, dipotong per operasi agar panel kode dapat menyorot
   // fungsi yang baru dijalankan. Baris `#define EOP_SIMBOL` berdiri sendiri
-  // dengan tanda eop agar Task 5 dapat menggantinya sesuai EOP pengguna.
+  // dengan tanda eop agar pengganti EOP dari antarmuka dapat disisipkan.
   global.Kode = {
     karakter: [
       {
