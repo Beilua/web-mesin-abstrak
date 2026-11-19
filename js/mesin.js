@@ -137,5 +137,121 @@
     return tolak(state, 'Aksi tidak dikenal.');
   }
 
-  global.Mesin = { validasi: validasi, karakterAwal: karakterAwal, karakter: karakter };
+  // State awal kata: belum ada kata yang dimuat.
+  function kataAwal(tape, eop) {
+    return {
+      tape: tape,
+      eop: eop,
+      idx: -1,
+      cw: null,
+      wlen: 0,
+      started: false,
+      selesai: false,
+      langkah: 0,
+      hitInc: 0,
+      hitReset: 0,
+      hitKata: 0,
+      hitGet: 0
+    };
+  }
+
+  // Memuat satu kata mulai dari sel tertentu; idx berhenti di pembatas.
+  function muatKata(state, mulai) {
+    var idx = mulai;
+    while (state.tape[idx] === ' ') {
+      idx++;
+    }
+    var awal = idx;
+    while (idx < state.tape.length && state.tape[idx] !== ' ' && state.tape[idx] !== state.eop) {
+      idx++;
+    }
+    var cw = state.tape.slice(awal, idx);
+    return {
+      idx: idx,
+      cw: cw,
+      wlen: cw.length,
+      selesai: state.tape[idx] === state.eop
+    };
+  }
+
+  function kata(state, aksi) {
+    if (aksi === 'START') {
+      var isi = muatKata(state, 0);
+      return {
+        state: Object.assign({}, state, isi, {
+          started: true,
+          langkah: 1,
+          hitInc: 0,
+          hitReset: 0,
+          hitKata: isi.cw.length > 0 ? 1 : 0,
+          hitGet: 0
+        }),
+        keterangan: 'START: CW = "' + isi.cw + '", idx = ' + isi.idx + '.'
+      };
+    }
+
+    if (!state.started) {
+      return tolak(state, 'Mesin belum dimulai. Tekan START terlebih dahulu.');
+    }
+
+    if (aksi === 'INC') {
+      if (state.selesai) {
+        return tolak(state, 'Mesin sudah di EOP. Tekan START untuk mengulang.');
+      }
+
+      var lanjut = muatKata(state, state.idx + 1);
+      return {
+        state: Object.assign({}, state, lanjut, {
+          hitInc: state.hitInc + 1,
+          hitKata: state.hitKata + (lanjut.cw.length > 0 ? 1 : 0),
+          langkah: state.langkah + 1
+        }),
+        keterangan: 'INC: CW = "' + lanjut.cw + '", idx = ' + lanjut.idx + '.'
+      };
+    }
+
+    if (aksi === 'RESET') {
+      return {
+        state: Object.assign({}, state, {
+          cw: '',
+          wlen: 0,
+          hitReset: state.hitReset + 1,
+          langkah: state.langkah + 1
+        }),
+        keterangan: 'RESET: CW dikosongkan.'
+      };
+    }
+
+    if (aksi === 'GETCW' || aksi === 'GETLEN') {
+      var baca = Object.assign({}, state);
+      baca.hitGet = state.hitGet + 1;
+      var hasil = aksi === 'GETCW' ? state.cw : state.wlen;
+      return {
+        state: baca,
+        hasil: hasil,
+        keterangan: aksi === 'GETCW'
+          ? 'GET CW: CW = "' + hasil + '".'
+          : 'GET LEN: wlen = ' + hasil + '.'
+      };
+    }
+
+    if (aksi === 'EOP') {
+      var diEop = state.tape[state.idx] === state.eop ? 1 : 0;
+      return {
+        state: Object.assign({}, state),
+        hasil: diEop,
+        keterangan: 'EOP: ' + (diEop === 1 ? 'sel adalah EOP.' : 'sel bukan EOP.')
+      };
+    }
+
+    return tolak(state, 'Aksi tidak dikenal.');
+  }
+
+  global.Mesin = {
+    validasi: validasi,
+    karakterAwal: karakterAwal,
+    karakter: karakter,
+    kataAwal: kataAwal,
+    kata: kata
+  };
 })(typeof window !== 'undefined' ? window : globalThis);

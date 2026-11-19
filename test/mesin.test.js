@@ -165,3 +165,136 @@ test('reducer karakter tidak mengubah state masukan', () => {
   Mesin.karakter(s, 'START');
   assert.deepEqual(s, salinan);
 });
+
+const PITA_KATA = 'i am nice.';
+
+function kataAwal(tape = PITA_KATA, eop = '.') {
+  return Mesin.kataAwal(tape, eop);
+}
+
+function kataStart(tape = PITA_KATA, eop = '.') {
+  return Mesin.kata(kataAwal(tape, eop), 'START').state;
+}
+
+function majuKata(state, aksi, n) {
+  for (let i = 0; i < n; i++) state = Mesin.kata(state, aksi).state;
+  return state;
+}
+
+test('START memuat kata pertama dan berhenti di spasi', () => {
+  const s = kataStart();
+  assert.equal(s.cw, 'i');
+  assert.equal(s.wlen, 1);
+  assert.equal(s.idx, 1);
+  assert.equal(s.selesai, false);
+  assert.equal(s.hitKata, 1);
+  assert.equal(s.langkah, 1);
+});
+
+test('INC memuat kata berikutnya', () => {
+  const r = Mesin.kata(kataStart(), 'INC');
+  assert.equal(r.state.cw, 'am');
+  assert.equal(r.state.wlen, 2);
+  assert.equal(r.state.idx, 4);
+  assert.equal(r.state.hitInc, 1);
+});
+
+test('INC sampai kata terakhir lalu EOP', () => {
+  const s = majuKata(kataStart(), 'INC', 2);
+  assert.equal(s.cw, 'nice');
+  assert.equal(s.wlen, 4);
+  assert.equal(s.idx, 9);
+  assert.equal(s.selesai, true);
+  assert.equal(s.hitKata, 3);
+});
+
+test('INC ditolak setelah EOP', () => {
+  const s = majuKata(kataStart(), 'INC', 2);
+  const r = Mesin.kata(s, 'INC');
+  assert.ok(r.galat);
+  assert.deepEqual(r.state, s);
+});
+
+test('RESET mengosongkan CW tanpa memindah idx', () => {
+  const s = majuKata(kataStart(), 'INC', 1);
+  const r = Mesin.kata(s, 'RESET');
+  assert.equal(r.state.cw, '');
+  assert.equal(r.state.wlen, 0);
+  assert.equal(r.state.idx, 4);
+  assert.equal(r.state.hitReset, 1);
+  assert.equal(r.state.langkah, 3);
+});
+
+test('START melewati spasi pembuka', () => {
+  const s = kataStart('   i am.');
+  assert.equal(s.cw, 'i');
+  assert.equal(s.wlen, 1);
+  assert.equal(s.idx, 4);
+});
+
+test('INC melewati beberapa spasi', () => {
+  const s = kataStart('i   am.');
+  assert.equal(s.idx, 1);
+  const r = Mesin.kata(s, 'INC');
+  assert.equal(r.state.cw, 'am');
+  assert.equal(r.state.wlen, 2);
+  assert.equal(r.state.idx, 6);
+  assert.equal(r.state.selesai, true);
+});
+
+test('pita hanya EOP menghasilkan CW kosong', () => {
+  const s = kataStart('.');
+  assert.equal(s.cw, '');
+  assert.equal(s.wlen, 0);
+  assert.equal(s.selesai, true);
+  assert.equal(s.hitKata, 0);
+});
+
+test('mesin kata berhenti di EOP pertama', () => {
+  const s = kataStart('ab.cd.');
+  assert.equal(s.cw, 'ab');
+  assert.equal(s.wlen, 2);
+  assert.equal(s.idx, 2);
+  assert.equal(s.selesai, true);
+});
+
+test('GET CW dan GET LEN membaca tanpa memindah mesin', () => {
+  const s = majuKata(kataStart(), 'INC', 1);
+  const cw = Mesin.kata(s, 'GETCW');
+  const len = Mesin.kata(cw.state, 'GETLEN');
+  assert.equal(cw.hasil, 'am');
+  assert.equal(len.hasil, 2);
+  assert.equal(cw.state.idx, 4);
+  assert.equal(len.state.idx, 4);
+  assert.equal(len.state.hitGet, 2);
+});
+
+test('EOP memeriksa sel idx, bukan kata', () => {
+  const s = kataStart();
+  assert.equal(Mesin.kata(s, 'EOP').hasil, 0);
+  const akhir = majuKata(s, 'INC', 2);
+  assert.equal(Mesin.kata(akhir, 'EOP').hasil, 1);
+});
+
+test('kata lebih dari 50 karakter tidak dipotong', () => {
+  const panjang = 'a'.repeat(60);
+  const s = kataStart(panjang + '.');
+  assert.equal(s.wlen, 60);
+  assert.equal(s.cw, panjang);
+});
+
+test('aksi kata ditolak sebelum START', () => {
+  const s = kataAwal();
+  assert.ok(Mesin.kata(s, 'INC').galat);
+  assert.ok(Mesin.kata(s, 'RESET').galat);
+  assert.ok(Mesin.kata(s, 'GETCW').galat);
+  assert.ok(Mesin.kata(s, 'GETLEN').galat);
+  assert.ok(Mesin.kata(s, 'EOP').galat);
+});
+
+test('reducer kata tidak mengubah state masukan', () => {
+  const s = kataAwal();
+  const salinan = JSON.parse(JSON.stringify(s));
+  Mesin.kata(s, 'START');
+  assert.deepEqual(s, salinan);
+});
