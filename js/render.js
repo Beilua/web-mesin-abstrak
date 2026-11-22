@@ -77,7 +77,7 @@
       }
       var nama = document.createElement('span');
       nama.className = 'var-nama';
-      nama.textContent = item[0];
+      nama.textContent = item[0] + ' = ';
       var nilai = document.createElement('span');
       nilai.className = 'var-nilai';
       nilai.textContent = item[1] === null ? '-' : String(item[1]);
@@ -144,6 +144,35 @@
     return nilai.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
   }
 
+  // Sorotan sintaks sederhana untuk cuplikan C.
+  function sorotSintaks(parent, teks) {
+    var re = /(\/\/.*)|(#\w+(?:[^\n]*)?)|('(?:\\.|[^'])*')|("(?:\\.|[^"])*")|\b(\d+)\b|\b(void|int|char|if|else|while|return|extern)\b/g;
+    var last = 0;
+    var m;
+    while ((m = re.exec(teks)) !== null) {
+      if (m.index > last) {
+        parent.appendChild(document.createTextNode(teks.slice(last, m.index)));
+      }
+      var cls = '';
+      if (m[1]) cls = 'tok-kom';
+      else if (m[2]) cls = 'tok-pp';
+      else if (m[3] || m[4]) cls = 'tok-str';
+      else if (m[5]) cls = 'tok-num';
+      else if (m[6]) cls = 'tok-kw';
+      var s = document.createElement('span');
+      s.className = cls;
+      s.textContent = m[0];
+      parent.appendChild(s);
+      last = m.index + m[0].length;
+    }
+    if (last < teks.length) {
+      parent.appendChild(document.createTextNode(teks.slice(last)));
+    }
+    if (teks === ' ') {
+      // pastikan satu spasi tetap tampil
+    }
+  }
+
   function kode(el, berkas, opAktif, eop) {
     kosongkan(el);
     berkas.forEach(function (file) {
@@ -156,7 +185,14 @@
       var teks = document.createElement('pre');
       teks.className = 'kode-teks';
 
-      file.blok.forEach(function (blok) {
+      var wadah = document.createElement('div');
+      wadah.className = 'kode-wadah';
+
+      var blokTampil = opAktif
+        ? file.blok.filter(function (blok) { return blok.op === opAktif; })
+        : file.blok.filter(function (blok) { return blok.op === null; });
+      if (blokTampil.length === 0) return;
+      blokTampil.forEach(function (blok) {
         blok.baris.forEach(function (baris) {
           var isi = baris;
           // Baris #define diperbarui di tempat agar baris kosong sesudahnya tetap ada.
@@ -169,11 +205,13 @@
           if (blok.op && blok.op === opAktif) {
             span.classList.add('aktif');
           }
-          span.textContent = isi === '' ? ' ' : isi;
-          teks.appendChild(span);
+          var teksBaris = isi === '' ? ' ' : isi;
+          sorotSintaks(span, teksBaris);
+          wadah.appendChild(span);
         });
       });
 
+      teks.appendChild(wadah);
       bagian.appendChild(judul);
       bagian.appendChild(teks);
       el.appendChild(bagian);

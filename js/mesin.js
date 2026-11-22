@@ -71,7 +71,9 @@
       );
       return {
         state: baru,
-        keterangan: 'START: mesin di indeks 0, CC = "' + baru.cc + '".'
+        keterangan:
+          'START: memulai mesin di indeks ' + baru.idx +
+          ', karakter saat ini = "' + baru.cc + '".'
       };
     }
 
@@ -90,7 +92,9 @@
         maju.langkah = state.langkah + 1;
         return {
           state: maju,
-          keterangan: 'INC: maju ke indeks ' + maju.idx + ', CC = "' + maju.cc + '".'
+          keterangan:
+            'INC: maju ke karakter selanjutnya di indeks ' + maju.idx +
+            ', karakter saat ini = "' + maju.cc + '".'
         };
       }
 
@@ -107,7 +111,8 @@
       return {
         state: lompat,
         keterangan:
-          'ADV: maju ke indeks ' + lompat.idx + ', CC = "' + lompat.cc + '"' +
+          'ADV: maju ke karakter selanjutnya di indeks ' + lompat.idx +
+          ', karakter saat ini = "' + lompat.cc + '"' +
           (spasi > 0 ? ' (melewati ' + spasi + ' spasi)' : '') + '.'
       };
     }
@@ -120,8 +125,8 @@
         state: baca,
         hasil: hasil,
         keterangan: aksi === 'GETCC'
-          ? 'GET CC: CC = "' + hasil + '".'
-          : 'GET IDX: idx = ' + hasil + '.'
+          ? 'GET CC: mengambil karakter saat ini = "' + hasil + '".'
+          : 'GET IDX: mengambil indeks saat ini = ' + hasil + '.'
       };
     }
 
@@ -130,7 +135,7 @@
       return {
         state: Object.assign({}, state),
         hasil: diEop,
-        keterangan: 'EOP: ' + (diEop === 1 ? 'CC adalah EOP.' : 'CC bukan EOP.')
+        keterangan: 'EOP: karakter saat ini ' + (diEop === 1 ? 'iya EOP.' : 'bukan EOP.')
       };
     }
 
@@ -186,7 +191,9 @@
           hitKata: isi.cw.length > 0 ? 1 : 0,
           hitGet: 0
         }),
-        keterangan: 'START: CW = "' + isi.cw + '", idx = ' + isi.idx + '.'
+        keterangan:
+          'START: memulai mesin di indeks ' + isi.idx +
+          ', kata saat ini = "' + isi.cw + '".'
       };
     }
 
@@ -206,7 +213,9 @@
           hitKata: state.hitKata + (lanjut.cw.length > 0 ? 1 : 0),
           langkah: state.langkah + 1
         }),
-        keterangan: 'INC: CW = "' + lanjut.cw + '", idx = ' + lanjut.idx + '.'
+        keterangan:
+          'INC: maju ke kata selanjutnya, kata saat ini = "' + lanjut.cw +
+          '", indeks = ' + lanjut.idx + '.'
       };
     }
 
@@ -230,8 +239,8 @@
         state: baca,
         hasil: hasil,
         keterangan: aksi === 'GETCW'
-          ? 'GET CW: CW = "' + hasil + '".'
-          : 'GET LEN: wlen = ' + hasil + '.'
+          ? 'GET CW: mengambil kata saat ini = "' + hasil + '".'
+          : 'GET LEN: mengambil panjang kata saat ini = ' + hasil + '.'
       };
     }
 
@@ -240,7 +249,7 @@
       return {
         state: Object.assign({}, state),
         hasil: diEop,
-        keterangan: 'EOP: ' + (diEop === 1 ? 'sel adalah EOP.' : 'sel bukan EOP.')
+        keterangan: 'EOP: karakter sudah ' + (diEop === 1 ? 'iya EOP.' : 'bukan EOP.')
       };
     }
 

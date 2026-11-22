@@ -4,7 +4,7 @@ Situs statis berbahasa Indonesia untuk menjalankan **Mesin Karakter** dan **Mesi
 
 ## Cara menjalankan
 
-Buka `index.html` langsung di peramban (protokol `file://`). Tidak perlu server, tidak perlu memasang apa pun, dan tidak ada permintaan jaringan. Font Patrick Hand sudah disertakan di folder `fonts/`.
+Buka `index.html` langsung di peramban (protokol `file://`). Tidak perlu server, tidak perlu memasang apa pun, dan tidak ada permintaan jaringan. Font piksel Departure Mono sudah disertakan di folder `fonts/`.
 
 ## Dua mesin dan tombolnya
 
@@ -61,13 +61,13 @@ Pilih mesin lewat tab **Mesin Karakter** atau **Mesin Kata**. Setiap mesin menyi
 | Berkas | Isi |
 | --- | --- |
 | `index.html` | Kerangka halaman: tab, kartu data, pita, tombol, panel, dan panel kode. |
-| `css/style.css` | Tema krem, garis hitam, aksen biru, dan tata letak responsif. |
+| `css/style.css` | Tema pixel art (palet NES, garis hitam tepis, font piksel), dan tata letak responsif. |
 | `js/mesin.js` | Reducer murni kedua mesin dan validasi pita/EOP. |
 | `js/kode.js` | Sumber C per operasi untuk panel kode. |
 | `js/render.js` | Menggambar pita, variabel, penghitung, log, dan sorotan kode. |
 | `js/app.js` | Menyambungkan tombol, tab, preset, dan state tiap mesin ke DOM. |
 | `test/` | Pengujian reducer dan data kode memakai test runner bawaan Node. |
-| `fonts/` | Patrick Hand (SIL OFL) untuk seluruh antarmuka. |
+| `fonts/` | Departure Mono (font piksel lokal) untuk seluruh antarmuka. |
 
 ## Pengujian
 
@@ -92,4 +92,4 @@ Simulator memakai string JavaScript, jadi kata lebih dari 50 karakter **tidak** 
 
 ## Font dan tema
 
-Seluruh antarmuka memakai **Patrick Hand** lokal (`fonts/PatrickHand-Regular.ttf`, SIL OFL). Tema terang mengikuti repo referensi: latar krem `#FEFDFB`, garis dan teks hitam, serta aksen biru `#1D4ED8`.
+Seluruh antarmuka memakai font piksel lokal **Departure Mono** (`fonts/DepartureMono-Regular.otf`); Patrick Hand tidak lagi digunakan. Tema pixel art dengan palet NES terbatas: latar hitam `#000000`, kartu `#212121`, garis hitam tepis, aksen merah `#D00000`, hijau `#00CC00`, dan biru `#0000FF`. Sudut tajam dan bayangan tanpa blur (`image-rendering: pixelated`, `box-shadow` piksel) dipertahankan.

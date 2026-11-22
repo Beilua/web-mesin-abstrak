@@ -39,17 +39,17 @@
   // Tiap mesin menyimpan pita, EOP, state reducer, log, dan sorotan kodenya.
   var state = {
     karakter: {
-      tape: 'jend  ela.',
+      tape: 'lap  top.',
       eop: '.',
-      mesin: Mesin.karakterAwal('jend  ela.', '.'),
+      mesin: Mesin.karakterAwal('lap  top.', '.'),
       log: [],
       opAktif: null,
       penjelasan: PENJELASAN_AWAL
     },
     kata: {
-      tape: 'i am nice.',
+      tape: 'i see you.',
       eop: '.',
-      mesin: Mesin.kataAwal('i am nice.', '.'),
+      mesin: Mesin.kataAwal('i see you.', '.'),
       log: [],
       opAktif: null,
       penjelasan: PENJELASAN_AWAL
@@ -139,13 +139,9 @@
     var m = state[aktif];
     var s = m.mesin;
     Render.pita(el.pita, s, aktif);
-    Render.legenda(el.legenda, MESIN[aktif].legenda);
     Render.panelVar(el.panelVar, barisVar(s));
-    Render.panelStat(el.panelStat, barisStat(s));
-    Render.log(el.log, m.log);
     Render.kode(el.kode, Kode[aktif], m.opAktif, m.eop);
     el.penjelasan.textContent = m.penjelasan;
-    el.statusPita.textContent = statusPita(s);
     perbaruiTombol(s);
   }
 
@@ -168,11 +164,8 @@
 
       var nama = document.createElement('span');
       nama.textContent = labelAksi(aksi);
-      var ket = document.createElement('span');
-      ket.textContent = item[1];
 
       tombol.appendChild(nama);
-      tombol.appendChild(ket);
       tombol.addEventListener('click', function () {
         jalankan(aksi);
       });
@@ -233,6 +226,7 @@
     m.opAktif = null;
     m.penjelasan = PENJELASAN_AWAL;
     hitungPita();
+    if (el.dialog && el.dialog.open) el.dialog.close();
     tampilkan();
   }
 
@@ -248,22 +242,33 @@
     tampilkan();
   }
 
+  function bukaEditor() {
+    var m = state[aktif];
+    el.pitaInput.value = m.tape;
+    el.eopInput.value = m.eop;
+    el.pesanGalat.hidden = true;
+    hitungPita();
+    if (typeof el.dialog.showModal === 'function') {
+      el.dialog.showModal();
+    } else {
+      el.dialog.setAttribute('open', '');
+    }
+  }
+
   function mulai() {
     el.pita = document.getElementById('pita');
-    el.statusPita = document.getElementById('status-pita');
-    el.legenda = document.getElementById('legenda');
     el.tombolMesin = document.getElementById('tombol-mesin');
     el.panelVar = document.getElementById('panel-var');
-    el.panelStat = document.getElementById('panel-stat');
     el.penjelasan = document.getElementById('penjelasan');
-    el.log = document.getElementById('log');
     el.kode = document.getElementById('kode');
+    el.dialog = document.getElementById('dialog-pita');
     el.pitaInput = document.getElementById('pita-input');
     el.pitaHitung = document.getElementById('pita-hitung');
     el.eopInput = document.getElementById('eop-input');
     el.pesanGalat = document.getElementById('pesan-galat');
     el.tabKarakter = document.getElementById('tab-karakter');
     el.tabKata = document.getElementById('tab-kata');
+    el.btnBatal = document.getElementById('btn-batal');
 
     el.tabKarakter.addEventListener('click', function () {
       pilihTab('karakter');
@@ -272,17 +277,18 @@
       pilihTab('kata');
     });
 
-    PRESET.forEach(function (item, i) {
-      var tombol = document.getElementById('preset-' + (i + 1));
-      tombol.addEventListener('click', function () {
-        el.pitaInput.value = item[1];
-        el.eopInput.value = '.';
-        hitungPita();
-        terapkan();
-      });
+    el.pita.addEventListener('click', bukaEditor);
+    el.pita.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        bukaEditor();
+      }
     });
 
     document.getElementById('btn-terapkan').addEventListener('click', terapkan);
+    el.btnBatal.addEventListener('click', function () {
+      if (el.dialog.open) el.dialog.close();
+    });
     el.pitaInput.addEventListener('input', hitungPita);
 
     isiKolom();
