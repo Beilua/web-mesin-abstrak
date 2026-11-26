@@ -182,7 +182,7 @@ button, input, select, textarea, output { font-family: inherit; }
 .sel-pita.aktif .spasi { color: var(--diatas-primer); }
 .sel-pita.eop { border-bottom: 4px solid var(--amber); }
 .sel-pita.lewat { opacity: .55; }
-.sel-pita.dalam-kata { background: var(--biru); }
+.sel-pita.dalam-kata { background: var(--aksen); }
 .sel-pita.aktif.dalam-kata { background: var(--primer); }
 .sel-pita.setelah-eop { opacity: .35; border-style: dashed; }
 /* Tombol mesin */
